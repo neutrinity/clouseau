@@ -30,7 +30,7 @@ class IndexManagerService(ctx: ServiceContext[ConfigurationArgs]) extends Servic
     class InnerLRU(initialCapacity: Int, loadFactor: Float) extends LinkedHashMap[String, Pid](initialCapacity, loadFactor, true) {
 
       override def removeEldestEntry(eldest: Entry[String, Pid]): Boolean = {
-        val result = size() > ctx.args.config.getInt("clouseau.max_indexes_open", 100)
+        val result = size() > ctx.args.config.getInt(Main.KeyClouseauMaxIndexesOpen, 100)
         if (result) {
           eldest.getValue ! ('close, 'lru)
         }
@@ -79,7 +79,7 @@ class IndexManagerService(ctx: ServiceContext[ConfigurationArgs]) extends Servic
   }
 
   val logger = Logger.getLogger("clouseau.main")
-  val rootDir = new File(ctx.args.config.getString("clouseau.dir", "target/indexes"))
+  val rootDir = new File(ctx.args.config.getString(Main.KeyClouseauDir, "target/indexes"))
   val openTimer = metrics.timer("opens")
   val lru = new LRU()
   val waiters = Map[String, List[(Pid, Reference)]]()

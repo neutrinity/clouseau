@@ -22,6 +22,13 @@ object Main extends App {
 
   val logger = Logger.getLogger("clouseau.main")
 
+  val KeyClouseauName = "CLOUSEAU_NAME"
+  val KeyClouseauCookie = "CLOUSEAU_COOKIE"
+  val KeyClouseauDir = "CLOUSEAU_DIR"
+  val KeyClouseauDirClass = "CLOUSEAU_DIR_CLASS"
+  val KeyClouseauLockClass = "CLOUSEAU_LOCK_CLASS"
+  val KeyClouseauMaxIndexesOpen = "CLOUSEAU_MAX_INDEXES_OPEN"
+
   Thread.setDefaultUncaughtExceptionHandler(
     new Thread.UncaughtExceptionHandler {
       def uncaughtException(t: Thread, e: Throwable) {
@@ -34,14 +41,15 @@ object Main extends App {
   // Load and monitor configuration file.
   val config = new CompositeConfiguration()
   config.addConfiguration(new SystemConfiguration())
+  config.addConfiguration(new EnvironmentConfiguration())
 
   val fileName = if (args.length > 0) args(0) else "clouseau.ini"
   val reloadableConfig = new HierarchicalINIConfiguration(fileName)
   reloadableConfig.setReloadingStrategy(new FileChangedReloadingStrategy)
   config.addConfiguration(reloadableConfig)
 
-  val name = config.getString("clouseau.name", "clouseau@127.0.0.1")
-  val cookie = config.getString("clouseau.cookie", "monster")
+  val name = config.getString(KeyClouseauName, "clouseau@127.0.0.1")
+  val cookie = config.getString(KeyClouseauCookie, "monster")
   val nodeconfig = NodeConfig(
     typeFactory = ClouseauTypeFactory,
     typeEncoder = ClouseauTypeEncoder,
