@@ -22,12 +22,21 @@ object Main extends App {
 
   val logger = Logger.getLogger("clouseau.main")
 
-  val KeyClouseauName = "CLOUSEAU_NAME"
-  val KeyClouseauCookie = "CLOUSEAU_COOKIE"
-  val KeyClouseauDir = "CLOUSEAU_DIR"
-  val KeyClouseauDirClass = "CLOUSEAU_DIR_CLASS"
-  val KeyClouseauLockClass = "CLOUSEAU_LOCK_CLASS"
-  val KeyClouseauMaxIndexesOpen = "CLOUSEAU_MAX_INDEXES_OPEN"
+  val KeyClouseauName = "clouseau.name"
+  val KeyClouseauCookie = "clouseau.cookie"
+  val KeyClouseauDir = "clouseau.dir"
+  val KeyClouseauDirClass = "clouseau.dir_class"
+  val KeyClouseauLockClass = "clouseau.lock_class"
+  val KeyClouseauMaxIndexesOpen = "clouseau.max_indexes_open"
+
+  val arguments = List(
+    KeyClouseauName,
+    KeyClouseauCookie,
+    KeyClouseauDir,
+    KeyClouseauDirClass,
+    KeyClouseauLockClass,
+    KeyClouseauMaxIndexesOpen
+  )
 
   Thread.setDefaultUncaughtExceptionHandler(
     new Thread.UncaughtExceptionHandler {
@@ -38,12 +47,18 @@ object Main extends App {
     }
   )
 
+  val argumentConfig = new BaseConfiguration()
+  args.zipWithIndex.foreach{ case (arg, i) =>
+    if (!arg.trim.isEmpty)
+      argumentConfig.setProperty(arguments(i), arg)
+  }
+
   // Load and monitor configuration file.
   val config = new CompositeConfiguration()
+  config.addConfiguration(argumentConfig)
   config.addConfiguration(new SystemConfiguration())
-  config.addConfiguration(new EnvironmentConfiguration())
 
-  val fileName = if (args.length > 0) args(0) else "clouseau.ini"
+  val fileName = "clouseau.ini"
   val reloadableConfig = new HierarchicalINIConfiguration(fileName)
   reloadableConfig.setReloadingStrategy(new FileChangedReloadingStrategy)
   config.addConfiguration(reloadableConfig)
