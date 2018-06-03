@@ -43,7 +43,7 @@ object Main extends App {
   config.addConfiguration(argumentConfig)
   config.addConfiguration(new SystemConfiguration())
 
-  val fileName = if (args.length > 0) args(0) else "clouseau.ini"
+  val fileName = if (args.length > 0 && args(0).length() > 0 ) args(0) else "clouseau.ini"
   val reloadableConfig = new HierarchicalINIConfiguration(fileName)
   reloadableConfig.setReloadingStrategy(new FileChangedReloadingStrategy)
   config.addConfiguration(reloadableConfig)
