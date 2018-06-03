@@ -22,22 +22,6 @@ object Main extends App {
 
   val logger = Logger.getLogger("clouseau.main")
 
-  val KeyClouseauName = "clouseau.name"
-  val KeyClouseauCookie = "clouseau.cookie"
-  val KeyClouseauDir = "clouseau.dir"
-  val KeyClouseauDirClass = "clouseau.dir_class"
-  val KeyClouseauLockClass = "clouseau.lock_class"
-  val KeyClouseauMaxIndexesOpen = "clouseau.max_indexes_open"
-
-  val arguments = List(
-    KeyClouseauName,
-    KeyClouseauCookie,
-    KeyClouseauDir,
-    KeyClouseauDirClass,
-    KeyClouseauLockClass,
-    KeyClouseauMaxIndexesOpen
-  )
-
   Thread.setDefaultUncaughtExceptionHandler(
     new Thread.UncaughtExceptionHandler {
       def uncaughtException(t: Thread, e: Throwable) {
@@ -48,9 +32,10 @@ object Main extends App {
   )
 
   val argumentConfig = new BaseConfiguration()
-  args.zipWithIndex.foreach{ case (arg, i) =>
-    if (!arg.trim.isEmpty)
-      argumentConfig.setProperty(arguments(i), arg)
+  for (arg <- args) {
+    val argPair = arg.split("=")
+    if (argPair.length == 2)
+      argumentConfig.setProperty(argPair(0), argPair(1))
   }
 
   // Load and monitor configuration file.
@@ -58,13 +43,13 @@ object Main extends App {
   config.addConfiguration(argumentConfig)
   config.addConfiguration(new SystemConfiguration())
 
-  val fileName = "clouseau.ini"
+  val fileName = if (args.length > 0) args(0) else "clouseau.ini"
   val reloadableConfig = new HierarchicalINIConfiguration(fileName)
   reloadableConfig.setReloadingStrategy(new FileChangedReloadingStrategy)
   config.addConfiguration(reloadableConfig)
 
-  val name = config.getString(KeyClouseauName, "clouseau@127.0.0.1")
-  val cookie = config.getString(KeyClouseauCookie, "monster")
+  val name = config.getString("clouseau.name", "clouseau@127.0.0.1")
+  val cookie = config.getString("clouseau.cookie", "monster")
   val nodeconfig = NodeConfig(
     typeFactory = ClouseauTypeFactory,
     typeEncoder = ClouseauTypeEncoder,

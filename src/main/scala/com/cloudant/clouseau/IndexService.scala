@@ -781,7 +781,7 @@ object IndexService {
   val DISTANCE_RE = "^([-+])?<distance,([\\.\\w]+),([\\.\\w]+),%s,%s,(mi|km)>$".format(FP, FP).r
 
   def start(node: Node, config: Configuration, path: String, options: Any): Any = {
-    val rootDir = new File(config.getString(Main.KeyClouseauDir, "target/indexes"))
+    val rootDir = new File(config.getString("clouseau.dir", "target/indexes"))
     val dir = newDirectory(config, new File(rootDir, path))
     try {
       SupportedAnalyzers.createAnalyzer(options) match {
@@ -800,12 +800,12 @@ object IndexService {
   }
 
   private def newDirectory(config: Configuration, path: File): Directory = {
-    val lockClassName = config.getString(Main.KeyClouseauLockClass,
+    val lockClassName = config.getString("clouseau.lock_class",
       "org.apache.lucene.store.NativeFSLockFactory")
     val lockClass = Class.forName(lockClassName)
     val lockFactory = lockClass.newInstance().asInstanceOf[LockFactory]
 
-    val dirClassName = config.getString(Main.KeyClouseauDirClass,
+    val dirClassName = config.getString("clouseau.dir_class",
       "org.apache.lucene.store.NIOFSDirectory")
     val dirClass = Class.forName(dirClassName)
     val dirCtor = dirClass.getConstructor(classOf[File], classOf[LockFactory])

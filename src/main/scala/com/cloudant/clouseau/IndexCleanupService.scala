@@ -24,7 +24,7 @@ import scalang._
 class IndexCleanupService(ctx: ServiceContext[ConfigurationArgs]) extends Service(ctx) with Instrumented {
 
   val logger = Logger.getLogger("clouseau.cleanup")
-  val rootDir = new File(ctx.args.config.getString(Main.KeyClouseauDir, "target/indexes"))
+  val rootDir = new File(ctx.args.config.getString("clouseau.dir", "target/indexes"))
 
   override def handleCast(msg: Any) = msg match {
     case CleanupPathMsg(path: String) =>
