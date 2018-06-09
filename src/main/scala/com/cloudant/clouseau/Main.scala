@@ -31,11 +31,19 @@ object Main extends App {
     }
   )
 
+  val argumentConfig = new BaseConfiguration()
+  for (arg <- args) {
+    val argPair = arg.split("=")
+    if (argPair.length == 2)
+      argumentConfig.setProperty(argPair(0), argPair(1))
+  }
+
   // Load and monitor configuration file.
   val config = new CompositeConfiguration()
+  config.addConfiguration(argumentConfig)
   config.addConfiguration(new SystemConfiguration())
 
-  val fileName = if (args.length > 0) args(0) else "clouseau.ini"
+  val fileName = if (args.length > 0 && args(0).length() > 0 ) args(0) else "clouseau.ini"
   val reloadableConfig = new HierarchicalINIConfiguration(fileName)
   reloadableConfig.setReloadingStrategy(new FileChangedReloadingStrategy)
   config.addConfiguration(reloadableConfig)
